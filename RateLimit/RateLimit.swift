@@ -12,6 +12,7 @@ open class RateLimit: NSObject {
 
     @discardableResult open class func execute(name: String, limit: TimeInterval, block: (Void) -> ()) -> Bool {
         if shouldExecute(name: name, limit: limit) {
+            recordExecution(name: name)
             block()
 			return true
         }
@@ -45,6 +46,10 @@ open class RateLimit: NSObject {
 	class func didChangeDictionary() {
 		// Do nothing
 	}
+    
+    fileprivate class func recordExecution(name: String) {
+        dictionary[name] = Date()
+    }
 
     fileprivate class func shouldExecute(name: String, limit: TimeInterval) -> Bool {
 		var should = false
@@ -59,9 +64,6 @@ open class RateLimit: NSObject {
 			} else {
 				should = true
 			}
-
-			// Record execution
-			dictionary[name] = Date()
 		}
 		
         return should
